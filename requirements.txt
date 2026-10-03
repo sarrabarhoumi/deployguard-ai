@@ -8,6 +8,7 @@ pytest
 ruff
 
 #Google Gemini SDK
+google-genai
 #Bandit
 #pip-audit
 #GitHub integration

@@ -1,13 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.schemas.analysis import (
     DeploymentAnalysisRequest,
     DeploymentAnalysisResponse,
     Finding,
 )
-
+from app.services.llm_service import GeminiService
 from app.services.risk_engine import analyze_diff
-
 
 router = APIRouter()
 
@@ -74,3 +73,22 @@ def analyze_deployment(
         findings=findings,
         recommendations=recommendations
     )
+
+@router.post("/api/v1/analyze/ai")
+def analyze_deployment_with_ai(
+    payload: DeploymentAnalysisRequest
+):
+    try:
+        service = GeminiService()
+
+        return service.analyze_deployment(
+            repository=payload.repository,
+            branch=payload.branch,
+            diff=payload.diff,
+        )
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"AI analysis unavailable: {exc}"
+        )
